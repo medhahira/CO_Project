@@ -211,7 +211,7 @@ for i in range(len(assembly)):
                         addr = len(assembly)+1-variables.index(j[k])-1
                         convert += convertor(addr)
                     elif j[k].strip() in labels.keys():
-                        addr = labels[j[k]][0]
+                        addr = labels[j[k]]
                         convert += addr
                     else:
                         print(j[k])
