@@ -133,8 +133,14 @@ for i in isa.keys():
                     convert += "0"
 
 variables = []
-for i in assembly:
-    j = i.strip().split(" ")
+for i in range(len(assembly)):
+    label_check = assembly[i].strip().split(":")
+    if len(label_check) >= 2:
+        labels[label_check[0]] = i
+    j = assembly[i].strip().split(" ")
+    if len(label_check) >= 2:
+        j.pop(0)
+#     j = i.strip().split(" ")
     #print(j)
     if j[0] == "mov":
         if "$" in j[2]:
@@ -146,6 +152,12 @@ for i in assembly:
             variables.append(j[1])
         else:
             print("ERROR, instruction is incomplete")
+    if j[0] == "jmp" or "jlt" or "jgt" or "je":
+        if j[1] not in labels.keys:
+            print("Error: memory address in jump instruction NOT a label")
+    if j[0] == "st" or "ld":
+        if j[2] not in variables:
+            print("Error: memory address must be a declared variable")
     elif j[0] in isa.keys():
         if len(j) == len(type_include[isa[j[0]][0]]):
             convert = ""
