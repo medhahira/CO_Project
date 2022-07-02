@@ -82,6 +82,12 @@ type_include = {
     "F" : ["op"],
     "var": ["declaration", "variable"]
 }
+jump_instructions = [
+    'jmp',
+    'jlt',
+    'jgt',
+    'je'
+]
 #for loop to store :
 
 reg_bits = 3
@@ -134,6 +140,7 @@ for i in isa.keys():
 
 variables = []
 labels = {}
+flag = False
 for i in range(len(assembly)):
     label_check = assembly[i].strip().split(":")
     if len(label_check) >= 2:
@@ -148,18 +155,24 @@ for i in range(len(assembly)):
             j[0] = "movi"
         else:
             j[0] = "movr"
-    if j[0] == "var":
+        flag = True
+    elif j[0] == "var":
         if len(j) == len(type_include[j[0]]):
             variables.append(j[1])
         else:
             print("ERROR, instruction is incomplete")
-    if j[0] == "jmp" or "jlt" or "jgt" or "je":
-        if j[1] not in labels.keys:
+        flag = True
+    elif j[0] in jump_instructions:
+        if j[1] not in labels.keys():
             print("Error: memory address in jump instruction NOT a label")
-    if j[0] == "st" or "ld":
+        flag = True
+    elif (j[0] == "st") or (j[0] == "ld"):
+        # print(j)
         if j[2] not in variables:
             print("Error: memory address must be a declared variable")
-    elif j[0] in isa.keys():
+        flag = True
+    if j[0] in isa.keys():
+        flag = True
         if len(j) == len(type_include[isa[j[0]][0]]):
             convert = ""
             for k in range(len(type_include[isa[j[0]][0]])):
@@ -188,5 +201,5 @@ for i in range(len(assembly)):
             print(convert)
         else:
             print("ERROR, length of instruction is insufficient")
-    else:
+    if flag == False:
         print("ERROR, undefined instruction")
