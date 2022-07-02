@@ -79,7 +79,8 @@ type_include = {
     "C" : ["op", "reg", "reg"],
     "D" : ["op", "reg", "mem"],
     "E" : ["op", "mem"],
-    "F" : ["op"]
+    "F" : ["op"],
+    "var": ["declaration", "variable"]
 }
 #for loop to store :
 
@@ -141,7 +142,10 @@ for i in assembly:
         else:
             j[0] = "movr"
     if j[0] == "var":
-        variables.append(j[1])
+        if len(j) == len(type_include[j[0]]):
+            variables.append(j[1])
+        else:
+            print("ERROR, instruction is incomplete")
     elif j[0] in isa.keys():
         if len(j) == len(type_include[isa[j[0]][0]]):
             convert = ""
