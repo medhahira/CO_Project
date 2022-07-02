@@ -136,7 +136,7 @@ variables = []
 for i in range(len(assembly)):
     label_check = assembly[i].strip().split(":")
     if len(label_check) >= 2:
-        labels[label_check[0]] = i
+        labels[label_check[0]] = convertor(i)
     j = assembly[i].strip().split(" ")
     if len(label_check) >= 2:
         j.pop(0)
