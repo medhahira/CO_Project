@@ -108,7 +108,7 @@ for line in sys.stdin:
             if isa["hlt"][0] in unused.keys():
                 for k in range(unused[isa["hlt"][0]]):
                     convert += "0"
-            print(convert)
+            #print(convert)
         break
     assembly.append(line)
 #print(assembly)
@@ -166,16 +166,16 @@ for i in range(len(assembly)):
         if len(j) == len(type_include[j[0]]):
             variables.append(j[1])
         else:
-            print("ERROR, instruction is incomplete")
+            print(f"ERROR, instruction is incomplete in line {i+1}")
     elif j[0] in jump_instructions:
         flag = True
         if j[1] not in labels.keys():
-            print("Error: memory address in jump instruction NOT a label")
+            print(f"Error: memory address in jump instruction NOT a label in line {i+1}")
     elif (j[0] == "st") or (j[0] == "ld"):
         # print(j)
         flag = True
         if j[2] not in variables:
-            print("Error: memory address must be a declared variable")
+            print(f"Error: memory address must be a declared variable in line {i+1}")
     if j[0] in isa.keys():
         flag = True
         if len(j) == len(type_include[isa[j[0]][0]]):
@@ -186,7 +186,11 @@ for i in range(len(assembly)):
                     for m in range(unused[isa[j[0]][0]]):
                         convert+="0"
                 if type_include[isa[j[0]][0]][k].strip() == "reg":
-                    convert+=regs[j[k]]
+                    try:
+                        convert+=regs[j[k]]
+                    except KeyError:
+                        print(f"ERROR, invalid register called in line {i+1}")
+                        #break
                 if type_include[isa[j[0]][0]][k].strip() == "imm":
                     if "$" in j[k]:
                         c = j[k].index("$")
@@ -201,9 +205,9 @@ for i in range(len(assembly)):
                                 answer = int(ans)
                                 convert += convertor(answer)
                             else:
-                                print("ERROR, number outside range of 0 to 255")
+                                print(f"ERROR, number outside range of 0 to 255 in line {i+1}")
                         else:
-                            print("ERROR, number not an int")
+                            print(f"ERROR, number not an int in line {i+1}")
                 if type_include[isa[j[0]][0]][k].strip() == "mem":
                     #print(variables)
                     #print(j[k])
@@ -215,11 +219,12 @@ for i in range(len(assembly)):
                         convert += addr
                     else:
                         print(j[k])
-                        print("ERROR, undefined variable used")
+                        print(f"ERROR, undefined variable or label used in line {i+1}")
 
             print(convert)
         else:
-            print("ERROR, length of instruction is insufficient")
+            print(f"ERROR, length of instruction is insufficient in line {i+1}")
     if flag == False:
-        print("ERROR, undefined instruction")
-#print(labels)
+        print(f"ERROR, undefined instruction in line {i+1}")
+
+print("0101000000000000")
