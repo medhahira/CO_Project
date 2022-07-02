@@ -133,6 +133,7 @@ for i in isa.keys():
                     convert += "0"
 
 variables = []
+labels = {}
 for i in range(len(assembly)):
     label_check = assembly[i].strip().split(":")
     if len(label_check) >= 2:
