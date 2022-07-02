@@ -98,7 +98,7 @@ convert = ""
 isa_flag = False
 
 assembly= []
-# CHANGE POSITION OF HALT BINARY INSTRUCTION 
+# CHANGE POSITION OF HALT BINARY INSTRUCTION
 for line in sys.stdin:
     if 'hlt' == line.rstrip():
         convert = ""
@@ -152,6 +152,7 @@ for i in range(len(assembly)):
         j.pop(0)
     if j[0] == ":":
         j.pop(0)
+    #print(j)
 #     j = i.strip().split(" ")
     #print(j)
     if j[0] == "mov":
