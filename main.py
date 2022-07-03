@@ -143,6 +143,7 @@ variables = []
 labels = {}
 flag = False
 check = []
+#print(assembly)
 for i in range(len(assembly)):
     #print(j)
     label_check = assembly[i].strip().split(":")
@@ -169,6 +170,8 @@ for i in range(len(check)):
         flag = True
     elif j[0] == "var":
         flag = True
+        if i>len(variables):
+            print("ERROR, illegal declaration")
         if len(j) == len(type_include[j[0]]):
             variables.append(j[1])
         else:
