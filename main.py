@@ -174,7 +174,7 @@ for i in range(len(check)):
     elif j[0] == "var":
         flag = True
         if i>len(variables):
-            print("ERROR, illegal declaration")
+            print(f"ERROR, illegal declaration of variables in line {i+1}, variables should be declared at the beginning of the code")
         if len(j) == len(type_include[j[0]]):
             variables.append(j[1])
         else:
