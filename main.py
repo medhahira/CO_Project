@@ -142,7 +142,9 @@ for i in isa.keys():
 variables = []
 labels = {}
 flag = False
+check = []
 for i in range(len(assembly)):
+    #print(j)
     label_check = assembly[i].strip().split(":")
     if len(label_check) >= 2:
         key = label_check[0].strip()
@@ -152,9 +154,13 @@ for i in range(len(assembly)):
         j.pop(0)
     if j[0] == ":":
         j.pop(0)
-    #print(j)
+    check.append(j)
 #     j = i.strip().split(" ")
     #print(j)
+#print(check)
+for i in range(len(check)):
+    #print(check[i])
+    j = check[i]
     if j[0] == "mov":
         if "$" in j[2]:
             j[0] = "movi"
