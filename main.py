@@ -147,11 +147,14 @@ check = []
 for i in range(len(assembly)):
     #print(j)
     label_check = assembly[i].strip().split(":")
-    if len(label_check) >= 2:
+    label_count = (len(label_check) - 1)
+    if label_count == 1:
         key = label_check[0].strip()
         labels[key] = convertor(i)
     j = assembly[i].strip().split(" ")
-    if len(label_check) >= 2:
+    if label_count > 1:
+        print(f"Error; more than one label given in line {i+1}")
+    if label_count == 1:
         j.pop(0)
     if j[0] == ":":
         j.pop(0)
