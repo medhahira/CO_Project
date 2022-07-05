@@ -163,21 +163,82 @@ def validate_label(name, location):  # It will be validated in second pass
         print(f'line {location}: UNDECLARED_LABEL: {name} used without declaration')
         terminate()
         
- 
+#checking the validity of instruction
+def check_instruction(line,location): 
+    inst = line.split()[0]
+    type_ = instruction_type.get(inst,None)
+    if type_=='A':
+        check_instruction_A(line,location)
+    elif type_=='B':
+        check_instruction_B(line,location)
+    elif type_=='C':
+        check_instruction_C(line,location)
+    elif type_=='D':
+        check_instruction_D(line,location)
+    elif type_=='E':
+        check_instruction_E(line,location)
+    elif type_=='F':
+        check_instruction_F(line,location)
+    elif type_=='BC':
+        check_instruction_BC(line,location)
+    else:
+        print(f'line {location}: ILLEGAL_Instruction: Invalid Instruction {inst}')
+        terminate()
+def check_instruction_A(line,location):
+    '''checks the type (add|sub|mul|xor|and) reg1 reg2 reg3'''
+    inst,reg1,reg2,reg3 = line.split()
+    for register in [reg1,reg2,reg3]:
+        validate_register(register,location)
+        
+def check_instruction_B(line,location):
+    inst,reg,val = line.split()
+    validate_register(reg,location)
+    validate_value(val,location)
 
+def check_instruction_C(line,location):
+    inst,reg1,reg2 = line.split()
+    validate_register(reg1,location)
+    validate_register(reg2,location)
 
+def check_instruction_BC(line,location):
+    inst,reg1,reg_or_imm = line.split()
+    validate_register(reg1,location)
+    ##reg_or_imm can be either reg or FLAGS or imm
+    if reg_or_imm == 'FLAGS':
+        return
+    elif reg_or_imm[0]=='$':
+        validate_value(reg_or_imm,location)
+    else:
+        validate_register(reg_or_imm,location)
 
+def check_instruction_D(line,location):
+    inst,reg,mem = line.split()
+    validate_register(reg,location)
+    validate_variable(mem,location)
 
+def check_instruction_E(line, location):
+    inst,mem = line.split()
+    #label can be only checked at second pass
+def check_instruction_F(line,location):
+    global halt_encountered
+    if line != 'hlt':
+        print(f'line {location}: INVALID_COMMAND: \'{line}\' command not valid')
+        terminate()
+    # if halt_encountered:
 
+    #     print(f'line {location}: MULTIPLE_HALTS: multiple halts are encountered')
+    #     terminate()
+    else:
+        halt_encountered=True
+#update the memory locations of the variables
+def assign_var_location():
+    global variable_table
+    variable_table = {name:current_mem_location+1*idx for idx,name in enumerate(variables)}
 
+##doubt: since memory is accessible in chunks of two bytes, will variables have difference of 1 byte in memory location, or 2??
+## change ()*idx accordingly
 
-
-
-
-
-
-
-
+instructions = []
 
 def convert_line(line,location):
     #empty line or label or variable declaration: do nothing
