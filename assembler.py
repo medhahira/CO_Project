@@ -162,3 +162,178 @@ def validate_label(name, location):  # It will be validated in second pass
     if name not in label_table:
         print(f'line {location}: UNDECLARED_LABEL: {name} used without declaration')
         terminate()
+        
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+def convert_line(line,location):
+    #empty line or label or variable declaration: do nothing
+    if not line or line[-1]==':' or line[:3]=='var':
+        return
+
+    else:
+        instructions.append(get_instruction(line,location))
+
+def get_instruction(line,location):
+    inst = line.split()[0]
+    #if inst not in instruction_type dict then throw an error
+    type_ = instruction_type[inst]
+    if type_=='A':
+        return get_instruction_A(line)
+    elif type_=='B':
+        return get_instruction_B(line)
+    elif type_=='C':
+        return get_instruction_C(line)
+    elif type_=='BC':
+        return get_instruction_BC(line)
+    elif type_=='D':
+        return get_instruction_D(line)
+    elif type_=='E':
+        return get_instruction_E(line,location)
+    elif type_=='F':
+        return get_instruction_F(line)
+
+def get_instruction_A(line):
+    '''OPCODE(5) UNUSED(2) REG1(3) REG2(3) REG3(3)'''
+    inst,reg1,reg2,reg3 = line.split()
+    opcode = ISA[inst]
+    reg1_addr = register_table[reg1]
+    reg2_addr = register_table[reg2]
+    reg3_addr = register_table[reg3]
+    return opcode  + '0'*2 + reg1_addr + reg2_addr + reg3_addr
+
+def get_instruction_B(line):
+    '''OPCODE(5) REG(3) IMMEDIATE VALUE(8)'''
+    inst,reg,value = line.split()
+    opcode = ISA[inst]
+    reg_addr = register_table[reg]
+    imm = binary(int(value[1:]))
+    return opcode  + reg_addr + imm
+
+def get_instruction_C(line):
+    '''OPCODE(5) UNUSED(5) REG1(3) REG2(3)'''
+    inst,reg1,reg2 = line.split()
+    opcode = ISA[inst]
+    reg1_addr = register_table[reg1]
+    reg2_addr = register_table[reg2]
+    return opcode + '0'*5 + reg1_addr + reg2_addr
+
+def get_instruction_BC(line):
+    '''OPCODE(5) REG(3) IMMEDIATE VALUE(8) | OPCODE(5) UNUSED(5) REG1(3) REG2(3)'''
+    inst,reg1,reg_or_imm = line.split()
+    
+    reg1_addr = register_table[reg1]
+    if reg_or_imm[0] == '$':
+        #imm
+        opcode = ISA[inst+'i']
+        imm = binary(int(reg_or_imm[1:]))
+        return opcode  + reg1_addr + imm
+    else:
+        opcode = ISA[inst+'r']
+        reg2_addr = register_table[reg_or_imm]
+        return opcode + '0'*5 + reg1_addr + reg2_addr
+
+def get_instruction_D(line):
+    '''OPCODE(5) REGISTER(3) MEM_ADDR(8)'''
+    inst,reg,mem = line.split()
+    opcode = ISA[inst]
+    reg_addr = register_table[reg]
+    mem_addr = binary(variable_table[mem])
+    return opcode + reg_addr + mem_addr
+
+def get_instruction_E(line,location):
+    '''OPCODE(5) UNUSED(3) MEM_ADDR(8)'''
+    inst,mem = line.split()
+    validate_label(mem,location)
+    opcode = ISA[inst]
+    mem_addr = binary(label_table[mem])
+    return opcode +'0'*3 +mem_addr
+
+def get_instruction_F(line):
+    '''OPCODE(5) UNUSED(11)'''
+    opcode = ISA['hlt']
+    return opcode + '0'*11
+
+def init():
+    global current_mem_location,variables,variable_table,label_table,variables_set,halt_encountered,instructions
+    current_mem_location = 0
+    variables = []
+    variable_table = dict()
+    label_table = dict()
+    variables_set=False
+    halt_encountered=False
+    instructions = []
+
+def print_state():
+    global current_mem_location,variables,variable_table,label_table,variables_set,halt_encountered
+    print(current_mem_location,variables,variable_table,label_table,variables_set,halt_encountered)
+
+def main(inp=None):
+    init()
+    if not inp:
+        inp = []
+        while True:
+            try:
+                line = input()
+            except EOFError:
+                break
+            inp.append(line)
+        inp='\n'.join(line for line in inp)
+    
+    
+    
+    
+    program = [[line.strip(),idx+1] for idx,line in enumerate(inp.split('\n'))]
+    program2=[]
+    for entry in program:
+        line,line_no = entry
+        if ':' in line:
+            idx = line.index(':')+1
+            program2.append([line[:idx],line_no])
+            program2.append([line[idx:],line_no])
+        else:
+            program2.append([line,line_no])
+
+    program=program2
+    
+    
+    
+    
+    idx=0
+    # print(*program,sep ='\n',end=f'\n --------------------------BREAK-----------------------------\n')################REMOVE
+    loc = 0
+    try:
+        for entry in program:
+            line,line_no = entry
+            loc = line_no
+            process_line(line,line_no)
+        #No halts encountered
+        if not halt_encountered:
+            print(f'line {idx+1}: NO_HALTS: No HALTS were found.')
+            terminate()
+
+        assign_var_location()
+        for entry in program:
+            line,line_no = entry
+            loc = line_no
+            convert_line(line,line_no)
+    
+        print(*instructions,sep='\n')
+    except SystemExit:
+        print('Exiting program')
+    except:
+        print(f'line {loc}: ILLEGAL FORMAT')
+main()
