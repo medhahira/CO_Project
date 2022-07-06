@@ -87,7 +87,7 @@ def process_line(line, location):
         print(f'line {location}: ILLEGAL_COMMAND: HALT already encountered')
         terminate()
     elif line[-1] == ':':
-        label_name = line[:-1]
+        label_name = line[:-1].lstrip()
         if label_name in variables:
             print(f'line {location}: ILLEGAL_LABEL: {label_name} clashes with a variable name')
             terminate()
@@ -102,7 +102,7 @@ def process_line(line, location):
         if variables_set:
             print(f'line {location}: ILLEGAL_DECLARATION: Cannot declare variable in the middle of program.')
             terminate()
-        var_name = line[4:]
+        var_name = line[4:].strip()
         if var_name in variables:
             print(f'line {location}: ILLEGAL_VARIABLE: Var {var_name} already a variable')
             terminate()
